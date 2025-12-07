@@ -60,16 +60,16 @@ export default function Home() {
 
   const getFormattedWeekString = (dateStr?: string) => {
     if (!dateStr) return '이번주 특가 상품을 확인하세요';
-    
+
     const date = new Date(dateStr);
     const month = date.getMonth() + 1;
-    
+
     // Calculate week number based on calendar row
     const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
     const dayOfWeek = firstDay.getDay();
     const day = date.getDate();
     const week = Math.ceil((day + dayOfWeek) / 7);
-    
+
     const weekMap = ['첫', '둘', '셋', '넷', '다섯', '여섯'];
     const weekText = weekMap[week - 1] || week;
 
@@ -87,10 +87,10 @@ export default function Home() {
             </div>
             <div className="flex flex-col">
               <h1 className="text-lg font-black text-gray-900 leading-none tracking-tight">
-                GS FRESH
+                캐파 장바구니
               </h1>
               <p className="text-[10px] text-[#2ECC71] font-bold tracking-widest uppercase leading-none mt-0.5">
-                WEEKLY SALE
+                GS프레시 김포고촌점
               </p>
             </div>
           </div>
@@ -118,9 +118,7 @@ export default function Home() {
 
           <h2 className="text-4xl sm:text-5xl font-black tracking-tight mb-4 leading-tight drop-shadow-sm">
             {currentFlyer ? (
-              <>
-                {currentFlyer.title}
-              </>
+              <>{currentFlyer.title}</>
             ) : (
               <>
                 이번 주<br />
@@ -151,7 +149,7 @@ export default function Home() {
 
           <div className="flex flex-col items-center justify-center gap-6">
             <CountdownTimer targetDateStr={currentFlyer?.week_end} />
-            
+
             {currentFlyer?.image_url && (
               <button
                 onClick={() => setIsFlyerModalOpen(true)}
@@ -171,7 +169,9 @@ export default function Home() {
           <h3 className="text-3xl font-bold text-gray-900 mb-3">
             이번주 행사 상품
           </h3>
-          <p className="text-gray-500">{getFormattedWeekString(currentFlyer?.week_start)}</p>
+          <p className="text-gray-500">
+            {getFormattedWeekString(currentFlyer?.week_start)}
+          </p>
         </div>
 
         {/* Filters */}
@@ -231,7 +231,7 @@ export default function Home() {
       {/* Flyer Modal */}
       {isFlyerModalOpen && currentFlyer && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
-          <div 
+          <div
             className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
             onClick={() => setIsFlyerModalOpen(false)}
           ></div>
