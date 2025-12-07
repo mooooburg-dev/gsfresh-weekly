@@ -113,7 +113,7 @@ export default function Home() {
               className="text-yellow-300"
               fill="currentColor"
             />
-            매주 목요일 업데이트
+            매주 수요일 업데이트
           </div>
 
           <h2 className="text-4xl sm:text-5xl font-black tracking-tight mb-4 leading-tight drop-shadow-sm">
@@ -164,8 +164,8 @@ export default function Home() {
       </div>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8 bg-white relative z-10 rounded-t-[2.5rem] -mt-10 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)]">
-        <div className="text-center mb-12">
+      <main className="max-w-7xl mx-auto px-2 md:px-4 py-16 sm:px-6 lg:px-8 bg-white relative z-10 rounded-t-[2.5rem] -mt-10 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)]">
+        <div className="text-center mb-6 md:mb-12">
           <h3 className="text-3xl font-bold text-gray-900 mb-3">
             이번주 행사 상품
           </h3>
@@ -175,7 +175,7 @@ export default function Home() {
         </div>
 
         {/* Filters */}
-        <div className="flex justify-center mb-12">
+        <div className="flex justify-center mb-2 md:mb-12">
           <div className="flex gap-2 overflow-x-auto pb-4 px-4 sm:px-0 no-scrollbar max-w-full">
             {CATEGORIES.map((category, index) => (
               <button
@@ -200,7 +200,7 @@ export default function Home() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-10">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-2 gap-y-2 md:gap-x-6 md:gap-y-10">
               {filteredProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
