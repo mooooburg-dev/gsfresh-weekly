@@ -118,7 +118,23 @@ export default function Home() {
 
           <h2 className="text-4xl sm:text-5xl font-black tracking-tight mb-4 leading-tight drop-shadow-sm">
             {currentFlyer ? (
-              <>{currentFlyer.title}</>
+              <>
+                <span className="relative">
+                  우리 동네, {currentFlyer.title}
+                  <svg
+                    className="absolute -bottom-2 left-0 w-full"
+                    viewBox="0 0 300 12"
+                    fill="none"
+                  >
+                    <path
+                      d="M2 10C50 4 100 2 150 4C200 6 250 8 298 2"
+                      stroke="rgba(255,255,255,0.4)"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                    ></path>
+                  </svg>
+                </span>
+              </>
             ) : (
               <>
                 이번 주<br />
@@ -156,7 +172,7 @@ export default function Home() {
                 className="inline-flex items-center gap-2 px-6 py-3 bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/40 rounded-full text-white font-bold transition-all hover:scale-105 active:scale-95 text-sm sm:text-base"
               >
                 <FileText size={18} />
-                전단 이미지 보기
+                이번주 행사 전단지 보기
               </button>
             )}
           </div>
