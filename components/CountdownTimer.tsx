@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 
-export default function CountdownTimer() {
+export default function CountdownTimer({ targetDateStr }: { targetDateStr?: string }) {
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -13,14 +13,23 @@ export default function CountdownTimer() {
   useEffect(() => {
     const calculateTimeLeft = () => {
       const now = new Date()
-      // Target: Next Thursday 00:00:00
-      // 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
-      const currentDay = now.getDay()
-      const daysUntilThursday = (4 - currentDay + 7) % 7
-      
-      const targetDate = new Date(now)
-      targetDate.setDate(now.getDate() + (daysUntilThursday === 0 ? 7 : daysUntilThursday))
-      targetDate.setHours(0, 0, 0, 0)
+      let targetDate: Date
+
+      if (targetDateStr) {
+        // Parse YYYY-MM-DD strictly as local time
+        const [year, month, day] = targetDateStr.split('-').map(Number)
+        targetDate = new Date(year, month - 1, day)
+        targetDate.setHours(23, 59, 59, 999)
+      } else {
+        // Fallback: Next Thursday 00:00:00 (Legacy behavior)
+        // 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
+        const currentDay = now.getDay()
+        const daysUntilThursday = (4 - currentDay + 7) % 7
+        
+        targetDate = new Date(now)
+        targetDate.setDate(now.getDate() + (daysUntilThursday === 0 ? 7 : daysUntilThursday))
+        targetDate.setHours(0, 0, 0, 0)
+      }
 
       const difference = targetDate.getTime() - now.getTime()
 
@@ -31,6 +40,8 @@ export default function CountdownTimer() {
           minutes: Math.floor((difference / 1000 / 60) % 60),
           seconds: Math.floor((difference / 1000) % 60),
         })
+      } else {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 })
       }
     }
 
@@ -38,7 +49,7 @@ export default function CountdownTimer() {
     const timer = setInterval(calculateTimeLeft, 1000)
 
     return () => clearInterval(timer)
-  }, [])
+  }, [targetDateStr])
 
   const TimeBox = ({ value, label }: { value: number; label: string }) => (
     <div className="flex flex-col items-center gap-2">
