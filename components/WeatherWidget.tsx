@@ -69,27 +69,27 @@ export default function WeatherWidget() {
   };
 
   return (
-    <div className="flex gap-2 items-center">
-      <div className="flex items-center gap-1.5 text-xs text-gray-500 font-medium mb-0.5">
+    <div className="flex flex-col items-end">
+      <div className="flex items-center gap-1 text-[10px] sm:text-xs text-gray-400 font-medium mb-0.5">
         <MapPin size={10} className="text-gray-400" />
         김포시 고촌읍
       </div>
-      <div className="flex items-center gap-3 bg-gray-50/80 backdrop-blur-sm px-3 py-1.5 rounded-full border border-gray-100 shadow-sm">
-        <span className="text-sm font-bold text-gray-700">
+      <div className="flex items-center gap-2">
+        <span className="text-xs sm:text-sm font-bold text-gray-700">
           {dateStr} ({dayStr})
         </span>
-        <div className="w-px h-3 bg-gray-200"></div>
+        <div className="w-px h-2.5 bg-gray-300"></div>
         {loading ? (
-          <Loader2 size={16} className="animate-spin text-gray-400" />
+          <Loader2 size={14} className="animate-spin text-gray-400" />
         ) : weather ? (
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1">
             {getWeatherIcon(weather.code)}
-            <span className="text-sm font-bold text-gray-800">
+            <span className="text-xs sm:text-sm font-bold text-gray-800">
               {weather.temp}°
             </span>
           </div>
         ) : (
-          <span className="text-xs text-gray-400">날씨 정보 없음</span>
+          <span className="text-xs text-gray-400">정보 없음</span>
         )}
       </div>
     </div>
