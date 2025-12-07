@@ -122,7 +122,9 @@ export default function ProductCard({ product }: ProductCardProps) {
               </div>
               <div className="flex items-center justify-between gap-2 bg-gradient-to-r from-gray-50 to-white px-2 py-1.5 rounded-lg border border-gray-100">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-xs">{discountInfo.icon}</span>
+                  <span className="hidden md:inline text-xs">
+                    {discountInfo.icon}
+                  </span>
                   <span className="text-[11px] font-semibold text-gray-700">
                     {discountInfo.name}
                   </span>
@@ -167,27 +169,27 @@ export default function ProductCard({ product }: ProductCardProps) {
             {product.coupang_price >
             (product.special_price || product.sale_price!) ? (
               <div className="bg-green-50 text-green-700 text-xs font-bold text-center py-1.5 rounded flex justify-center items-center gap-1">
-                <span>👍</span>
+                <span className="hidden md:inline">👍</span>
                 <span>
                   쿠팡보다{' '}
                   {(
                     product.coupang_price -
                     (product.special_price || product.sale_price!)
                   ).toLocaleString()}
-                  원 더 저렴해요!
+                  원 저렴해요!
                 </span>
               </div>
             ) : (
               <div className="space-y-2">
                 <div className="bg-orange-50 text-orange-700 text-xs font-bold text-center py-1.5 rounded flex justify-center items-center gap-1">
-                  <span>💰</span>
+                  <span className="hidden md:inline">💰</span>
                   <span>
                     쿠팡이{' '}
                     {(
                       (product.special_price || product.sale_price) -
                       product.coupang_price
                     ).toLocaleString()}
-                    원 더 저렴해요!
+                    원 저렴해요!
                   </span>
                 </div>
                 {product.coupang_url && (
