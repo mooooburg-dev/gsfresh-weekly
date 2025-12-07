@@ -81,7 +81,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           )}
         </div>
 
-        <div className="mb-2">
+        <div>
           {/* 특별 할인이 있는 경우 */}
           {hasSpecialPrice ? (
             <div className="flex flex-col gap-1">
@@ -102,15 +102,15 @@ export default function ProductCard({ product }: ProductCardProps) {
             </div>
           ) : (
             /* 일반 가격 표시 */
-            <div className="flex flex-col">
+            <div className="flex items-center gap-2">
+              <div className="text-lg font-extrabold text-red-600 ">
+                {product.sale_price.toLocaleString()}원
+              </div>
               {product.original_price && (
                 <div className="text-xs text-gray-400 line-through mb-0.5">
                   {product.original_price.toLocaleString()}원
                 </div>
               )}
-              <div className="text-lg font-extrabold text-gray-900">
-                {product.sale_price.toLocaleString()}원
-              </div>
             </div>
           )}
 

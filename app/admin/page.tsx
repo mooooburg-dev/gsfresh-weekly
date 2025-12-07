@@ -368,7 +368,7 @@ export default function AdminPage() {
       }
 
       alert('기획전이 삭제되었습니다.');
-      
+
       // Refresh list
       const { data } = await supabase
         .from('gsfresh_weekly_flyers')
