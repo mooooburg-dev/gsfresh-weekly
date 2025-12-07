@@ -8,9 +8,11 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 // Types
 export type Flyer = {
   id: string
+  title?: string
   week_start: string
   week_end: string
   image_url: string
+  image_urls?: string[]
   created_at: string
 }
 
@@ -28,4 +30,10 @@ export type Product = {
   special_price?: number | null
   special_discount_text?: string | null
   unit?: string | null
+  coupang_url?: string | null
+  coupang_price?: number | null
+  // Discount option (single selection)
+  discount_option?: string | null // 'gspay', 'kakaopay', 'ncoupon', 'gsmembership'
+  discount_amount_text?: string | null // "3000원"
+  discount_percent_text?: string | null // "10%"
 }
