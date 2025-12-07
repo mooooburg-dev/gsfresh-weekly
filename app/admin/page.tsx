@@ -337,6 +337,62 @@ export default function AdminPage() {
     setOcrResults(ocrResults.filter((_, i) => i !== index));
   };
 
+  const handleDeleteFlyer = async () => {
+    if (!selectedFlyerId) return;
+    if (
+      !confirm(
+        '정말 이 기획전을 삭제하시겠습니까?\n\n주의: 이 기획전에 등록된 모든 상품 데이터도 함께 삭제될 수 있습니다.'
+      )
+    )
+      return;
+
+    try {
+      // 1. Delete products first (safeguard against non-cascade)
+      const { error: productsError } = await supabase
+        .from('gsfresh_weekly_products')
+        .delete()
+        .eq('flyer_id', selectedFlyerId);
+
+      if (productsError) {
+        console.error('Products delete error:', productsError);
+      }
+
+      // 2. Delete flyer
+      const { error } = await supabase
+        .from('gsfresh_weekly_flyers')
+        .delete()
+        .eq('id', selectedFlyerId);
+
+      if (error) {
+        throw error;
+      }
+
+      alert('기획전이 삭제되었습니다.');
+      
+      // Refresh list
+      const { data } = await supabase
+        .from('gsfresh_weekly_flyers')
+        .select('*')
+        .order('week_start', { ascending: false });
+
+      if (data) {
+        setFlyers(data);
+        if (data.length > 0) {
+          setSelectedFlyerId(data[0].id);
+        } else {
+          setSelectedFlyerId(null);
+          setProducts([]);
+        }
+      } else {
+        setFlyers([]);
+        setSelectedFlyerId(null);
+        setProducts([]);
+      }
+    } catch (e: any) {
+      alert('삭제 실패: ' + e.message);
+    }
+  };
+
   const handleDeleteImage = async (urlToDelete: string) => {
     if (!selectedFlyerId) return;
     if (!confirm('정말 이 이미지를 삭제하시겠습니까?')) return;
@@ -681,6 +737,16 @@ export default function AdminPage() {
                     title="기획전 일정/제목 수정"
                   >
                     <Edit size={18} />
+                  </button>
+                )}
+
+                {selectedFlyerId && !isOCRMode && (
+                  <button
+                    onClick={handleDeleteFlyer}
+                    className="p-2 border border-gray-200 bg-white text-red-500 rounded-lg hover:bg-red-50 hover:text-red-600 transition-colors"
+                    title="기획전 삭제"
+                  >
+                    <Trash2 size={18} />
                   </button>
                 )}
               </div>
