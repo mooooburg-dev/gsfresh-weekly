@@ -117,7 +117,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           {/* 할인 옵션 표시 */}
           {discountInfo && (
             <div className="mt-3 pt-3 border-t border-gray-200">
-              <div className="text-[11px] font-semibold text-gray-600 mb-2">
+              <div className="hidden md:block text-[11px] font-semibold text-gray-600 mb-2">
                 추가 할인
               </div>
               <div className="flex items-center justify-between gap-2 bg-gradient-to-r from-gray-50 to-white px-2 py-1.5 rounded-lg border border-gray-100">
