@@ -1,75 +1,81 @@
-import ProductCard from '@/components/ProductCard';
-import { Product } from '@/lib/supabase';
-import { Leaf, ShoppingBag, Sparkles, Upload } from 'lucide-react';
-import CountdownTimer from '@/components/CountdownTimer';
+'use client';
 
-// Mock Data for visualization
-const MOCK_PRODUCTS: Product[] = [
-  {
-    id: '1',
-    flyer_id: 'f1',
-    name: '갓 수확한 딸기',
-    original_price: null,
-    sale_price: 14900,
-    discount_rate: null,
-    category: '과일',
-    image_url:
-      'https://images.unsplash.com/photo-1518635017498-87f514b751ba?auto=format&fit=crop&q=80&w=800',
-    created_at: new Date().toISOString(),
-    unit: '500g/팩',
-    special_price: 9900,
-    special_discount_text: 'GS Pay/팝 5천원 추가할인',
-  },
-  {
-    id: '2',
-    flyer_id: 'f1',
-    name: '서귀포 감귤',
-    original_price: null,
-    sale_price: 14900,
-    discount_rate: null,
-    category: '과일',
-    image_url:
-      'https://images.unsplash.com/photo-1582281298055-e25b84a30b0b?auto=format&fit=crop&q=80&w=800',
-    created_at: new Date().toISOString(),
-    unit: '3kg/박스',
-    special_price: 11900,
-    special_discount_text: 'GS Pay/팝 3천원 추가할인',
-  },
-  {
-    id: '3',
-    flyer_id: 'f1',
-    name: '한돈 삼겹살/오겹살/목심 구이용',
-    original_price: null,
-    sale_price: 16900,
-    discount_rate: null,
-    category: '정육',
-    image_url:
-      'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?auto=format&fit=crop&q=80&w=800',
-    created_at: new Date().toISOString(),
-    unit: '500g/팩',
-    special_price: 13900,
-    special_discount_text: '카드/GS Pay/팝 3천원 추가할인',
-  },
-  {
-    id: '4',
-    flyer_id: 'f1',
-    name: '오뚜기 봉지면 전품목',
-    original_price: null,
-    sale_price: 4980,
-    discount_rate: 20,
-    category: '가공식품',
-    image_url:
-      'https://images.unsplash.com/photo-1612929633738-8fe44f7ec841?auto=format&fit=crop&q=80&w=800',
-    created_at: new Date().toISOString(),
-    unit: '각',
-    special_price: null,
-    special_discount_text: 'GS Pay/팝카드 20% 할인',
-  },
-];
+import { useState, useEffect } from 'react';
+import ProductCard from '@/components/ProductCard';
+import { supabase, type Product, type Flyer } from '@/lib/supabase';
+import { Leaf, ShoppingBag, Sparkles, X, FileText } from 'lucide-react';
+import CountdownTimer from '@/components/CountdownTimer';
 
 const CATEGORIES = ['전체', '정육', '채소', '과일', '수산', '가공식품'];
 
+import WeatherWidget from '@/components/WeatherWidget';
+
 export default function Home() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activeCategory, setActiveCategory] = useState('전체');
+  const [currentFlyer, setCurrentFlyer] = useState<Flyer | null>(null);
+  const [isFlyerModalOpen, setIsFlyerModalOpen] = useState(false);
+
+  useEffect(() => {
+    fetchLatestProducts();
+  }, []);
+
+  async function fetchLatestProducts() {
+    try {
+      // 1. Get latest flyer
+      const { data: flyers } = await supabase
+        .from('gsfresh_weekly_flyers')
+        .select('*')
+        .order('week_start', { ascending: false })
+        .limit(1);
+
+      if (flyers && flyers.length > 0) {
+        const latestFlyer = flyers[0];
+        setCurrentFlyer(latestFlyer);
+        const latestFlyerId = latestFlyer.id;
+
+        // 2. Get products for that flyer
+        const { data: products } = await supabase
+          .from('gsfresh_weekly_products')
+          .select('*')
+          .eq('flyer_id', latestFlyerId)
+          .order('category'); // Sort by category or created_at
+
+        if (products) {
+          setProducts(products);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const filteredProducts =
+    activeCategory === '전체'
+      ? products
+      : products.filter((p) => p.category === activeCategory);
+
+  const getFormattedWeekString = (dateStr?: string) => {
+    if (!dateStr) return '이번주 특가 상품을 확인하세요';
+    
+    const date = new Date(dateStr);
+    const month = date.getMonth() + 1;
+    
+    // Calculate week number based on calendar row
+    const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+    const dayOfWeek = firstDay.getDay();
+    const day = date.getDate();
+    const week = Math.ceil((day + dayOfWeek) / 7);
+    
+    const weekMap = ['첫', '둘', '셋', '넷', '다섯', '여섯'];
+    const weekText = weekMap[week - 1] || week;
+
+    return `${month}월 ${weekText}째주 특가 상품을 확인하세요`;
+  };
+
   return (
     <div className="min-h-screen bg-white font-sans">
       {/* Header */}
@@ -88,14 +94,7 @@ export default function Home() {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors cursor-pointer">
-            <span className="text-sm font-medium hidden sm:block">
-              이번주 행사 상품
-            </span>
-            <div className="w-9 h-9 bg-gray-50 rounded-full flex items-center justify-center border border-gray-100">
-              <ShoppingBag size={18} />
-            </div>
-          </div>
+          <WeatherWidget />
         </div>
       </header>
 
@@ -117,17 +116,51 @@ export default function Home() {
             매주 목요일 업데이트
           </div>
 
-          <h2 className="text-5xl sm:text-6xl font-black tracking-tight mb-6 leading-tight drop-shadow-sm">
-            이번 주<br />
-            신선함 그대로
+          <h2 className="text-4xl sm:text-5xl font-black tracking-tight mb-4 leading-tight drop-shadow-sm">
+            {currentFlyer ? (
+              <>
+                {currentFlyer.title}
+              </>
+            ) : (
+              <>
+                이번 주<br />
+                <span className="relative">
+                  신선함 그대로
+                  <svg
+                    className="absolute -bottom-2 left-0 w-full"
+                    viewBox="0 0 300 12"
+                    fill="none"
+                  >
+                    <path
+                      d="M2 10C50 4 100 2 150 4C200 6 250 8 298 2"
+                      stroke="rgba(255,255,255,0.4)"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                    ></path>
+                  </svg>
+                </span>
+              </>
+            )}
           </h2>
 
-          <p className="text-lg sm:text-xl text-emerald-50 max-w-2xl mx-auto font-medium mb-10 leading-relaxed opacity-90">
-            산지의 신선함을 식탁까지, GS FRESH 주간 특가 상품을 만나보세요.
+          <p className="text-lg sm:text-xl text-emerald-50 max-w-2xl mx-auto font-medium leading-relaxed opacity-90 mb-8">
+            {currentFlyer
+              ? `${currentFlyer.week_start} ~ ${currentFlyer.week_end}`
+              : '산지의 신선함을 식탁까지, GS FRESH 주간 특가 상품을 만나보세요.'}
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <CountdownTimer />
+          <div className="flex flex-col items-center justify-center gap-6">
+            <CountdownTimer targetDateStr={currentFlyer?.week_end} />
+            
+            {currentFlyer?.image_url && (
+              <button
+                onClick={() => setIsFlyerModalOpen(true)}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/40 rounded-full text-white font-bold transition-all hover:scale-105 active:scale-95 text-sm sm:text-base"
+              >
+                <FileText size={18} />
+                전단 이미지 보기
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -138,7 +171,7 @@ export default function Home() {
           <h3 className="text-3xl font-bold text-gray-900 mb-3">
             이번주 행사 상품
           </h3>
-          <p className="text-gray-500">12월 첫째주 특가 상품을 확인하세요</p>
+          <p className="text-gray-500">{getFormattedWeekString(currentFlyer?.week_start)}</p>
         </div>
 
         {/* Filters */}
@@ -147,8 +180,9 @@ export default function Home() {
             {CATEGORIES.map((category, index) => (
               <button
                 key={category}
+                onClick={() => setActiveCategory(category)}
                 className={`px-5 py-2.5 rounded-full text-sm font-bold whitespace-nowrap transition-all ${
-                  index === 0
+                  activeCategory === category
                     ? 'bg-[#2ECC71] text-white shadow-md shadow-green-200'
                     : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
                 }`}
@@ -159,26 +193,79 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-10">
-          {MOCK_PRODUCTS.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-
-        {MOCK_PRODUCTS.length === 0 && (
-          <div className="text-center py-20 bg-gray-50 rounded-3xl border border-dashed border-gray-200">
-            <p className="text-gray-400 text-lg">
-              상품 정보를 불러오는 중입니다...
-            </p>
+        {loading ? (
+          <div className="text-center py-20">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-gray-200 border-t-[#2ECC71] mb-4"></div>
+            <p className="text-gray-500">상품을 불러오는 중입니다...</p>
           </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-10">
+              {filteredProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+
+            {products.length === 0 && (
+              <div className="text-center py-20 bg-gray-50 rounded-3xl border border-dashed border-gray-200">
+                <p className="text-gray-400 text-lg">
+                  등록된 행사 상품이 없습니다.
+                </p>
+              </div>
+            )}
+          </>
         )}
       </main>
 
       <footer className="bg-white border-t border-gray-100 py-12">
         <div className="max-w-7xl mx-auto px-4 text-center text-gray-400 text-sm">
           &copy; {new Date().getFullYear()} GS FRESH. All rights reserved.
+          <a
+            href="/admin"
+            className="ml-2 text-gray-300 hover:text-gray-500 transition-colors"
+          >
+            Admin
+          </a>
         </div>
       </footer>
+      {/* Flyer Modal */}
+      {isFlyerModalOpen && currentFlyer && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+          <div 
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
+            onClick={() => setIsFlyerModalOpen(false)}
+          ></div>
+          <div className="relative bg-white rounded-2xl overflow-hidden max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl animate-in fade-in zoom-in-95 duration-300">
+            <div className="flex items-center justify-between p-4 border-b">
+              <h3 className="text-lg font-bold text-gray-900">
+                {currentFlyer.title || '전단 행사'}
+              </h3>
+              <button
+                onClick={() => setIsFlyerModalOpen(false)}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-500"
+              >
+                <X size={24} />
+              </button>
+            </div>
+            <div className="flex-1 overflow-auto bg-gray-100">
+              <div className="flex flex-col items-center min-h-full">
+                {(currentFlyer.image_urls && currentFlyer.image_urls.length > 0
+                  ? currentFlyer.image_urls
+                  : [currentFlyer.image_url]
+                ).map((url, index) => (
+                  <img
+                    key={index}
+                    src={url}
+                    alt={`전단 행사 이미지 ${index + 1}`}
+                    className="w-full max-w-4xl h-auto object-contain shadow-sm"
+                    loading="lazy"
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
