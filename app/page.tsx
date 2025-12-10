@@ -123,7 +123,9 @@ export default function Home() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
           {isRestDay ? (
             <div className="inline-flex items-center gap-2 bg-rose-500/90 backdrop-blur-md px-4 py-2 rounded-full text-base font-bold mb-8 border border-white/20 shadow-lg animate-bounce">
-              <span className="text-white">오늘은 우리동네 GS프레시 쉬는 날 😴</span>
+              <span className="text-white">
+                오늘은 우리동네 GS프레시 쉬는 날 😴
+              </span>
             </div>
           ) : (
             <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md px-4 py-1.5 rounded-full text-sm font-medium mb-8 border border-white/20 shadow-sm">
@@ -140,7 +142,8 @@ export default function Home() {
             {currentFlyer ? (
               <>
                 <span className="relative">
-                  우리 동네, {currentFlyer.title}
+                  우리 동네,
+                  <br className="md:hidden" /> {currentFlyer.title}
                   <svg
                     className="absolute -bottom-2 left-0 w-full"
                     viewBox="0 0 300 12"
