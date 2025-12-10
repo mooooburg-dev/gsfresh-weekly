@@ -16,10 +16,24 @@ export default function Home() {
   const [activeCategory, setActiveCategory] = useState('전체');
   const [currentFlyer, setCurrentFlyer] = useState<Flyer | null>(null);
   const [isFlyerModalOpen, setIsFlyerModalOpen] = useState(false);
+  const [isRestDay, setIsRestDay] = useState(false);
 
   useEffect(() => {
     fetchLatestProducts();
+    checkRestDay();
   }, []);
+
+  const checkRestDay = () => {
+    const now = new Date();
+    const day = now.getDay(); // 0=Sun, 1=Mon, 2=Tue, 3=Wed, ...
+    const date = now.getDate();
+    const weekNum = Math.ceil(date / 7);
+
+    // Wednesday is 3. 2nd or 4th week.
+    if (day === 3 && (weekNum === 2 || weekNum === 4)) {
+      setIsRestDay(true);
+    }
+  };
 
   async function fetchLatestProducts() {
     try {
@@ -107,14 +121,20 @@ export default function Home() {
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
-          <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md px-4 py-1.5 rounded-full text-sm font-medium mb-8 border border-white/20 shadow-sm">
-            <Sparkles
-              size={14}
-              className="text-yellow-300"
-              fill="currentColor"
-            />
-            매주 수요일 업데이트
-          </div>
+          {isRestDay ? (
+            <div className="inline-flex items-center gap-2 bg-rose-500/90 backdrop-blur-md px-4 py-2 rounded-full text-base font-bold mb-8 border border-white/20 shadow-lg animate-bounce">
+              <span className="text-white">오늘은 우리동네 GS프레시 쉬는 날 😴</span>
+            </div>
+          ) : (
+            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md px-4 py-1.5 rounded-full text-sm font-medium mb-8 border border-white/20 shadow-sm">
+              <Sparkles
+                size={14}
+                className="text-yellow-300"
+                fill="currentColor"
+              />
+              매주 수요일 업데이트
+            </div>
+          )}
 
           <h2 className="text-4xl sm:text-5xl font-black tracking-tight mb-4 leading-tight drop-shadow-sm">
             {currentFlyer ? (
